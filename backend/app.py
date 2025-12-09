@@ -3,11 +3,12 @@ import os
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
 from pydantic import BaseModel
 
-# Carga lobal
+# Carga de archivos globales
 load_dotenv()
 
 
@@ -44,6 +45,21 @@ class PromptRequest(BaseModel):
 
 # Inicialización de servicios
 app = FastAPI()
+
+# Definimos los orígenes permitidos
+origins = [
+    "http://localhost:5173",  # puerto del frontend
+    "http://127.0.0.1:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Permite las URLs
+    allow_credentials=True,  # Permite cookies
+    allow_methods=["*"],  # Permite todos los métodos (POST, GET, etc.)
+    allow_headers=["*"],
+)
+
 asistente = AsistenteIA()
 
 
