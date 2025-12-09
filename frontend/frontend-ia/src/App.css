@@ -1,0 +1,80 @@
+/* Estilos básicos para la estructura */
+.contenedor-ia {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: sans-serif;
+}
+
+h1 {
+  color: #3f72af; /* Color principal */
+  text-align: center;
+}
+
+p {
+  text-align: center;
+  color: #555;
+}
+
+/* Estilos del formulario */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  resize: vertical;
+}
+
+button {
+  padding: 12px 20px;
+  background-color: #3f72af;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover:not(:disabled) {
+  background-color: #112d4e; /* Color oscuro al pasar el mouse */
+}
+
+button:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
+/* Estilos del contenedor de respuesta */
+.respuesta-container {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f7f7; /* Fondo claro */
+}
+
+.respuesta-container h2 {
+  color: #112d4e;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 10px;
+  margin-top: 0;
+  text-align: left;
+}
+
+.respuesta-texto {
+  white-space: pre-wrap; /* Para preservar saltos de línea y formato */
+  text-align: left;
+  line-height: 1.6;
+  color: #333;
+}

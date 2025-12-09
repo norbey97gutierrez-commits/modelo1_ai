@@ -1,0 +1,27 @@
+En Python, las cadenas de texto (strings) se pueden definir utilizando comillas simples (`'`), comillas dobles (`"`), comillas triples simples (`'''`) o comillas triples dobles (`"""`). Aquí te muestro algunos ejemplos:
+
+1. **Comillas simples**:
+   ```python
+   cadena1 = 'Hola, mundo!'
+   ```
+
+2. **Comillas dobles**:
+   ```python
+   cadena2 = "Hola, mundo!"
+   ```
+
+3. **Comillas triples simples** (útil para cadenas multilínea):
+   ```python
+   cadena3 = '''Este es un ejemplo
+   de una cadena
+   en múltiples líneas.'''
+   ```
+
+4. **Comillas triples dobles** (también útil para cadenas multilínea):
+   ```python
+   cadena4 = """Este es otro ejemplo
+   de una cadena
+   en múltiples líneas."""
+   ```
+
+Puedes elegir cualquiera de estos métodos para definir cadenas en función de tus necesidades. Las comillas triples son especialmente útiles si necesitas manejar saltos de línea o contener comillas dentro de la cadena sin necesidad de escapar.
