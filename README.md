@@ -23,10 +23,10 @@ Antes de comenzar, asegúrese de tener instalado lo siguiente:
 
 ## 🚀 Instalación y configuración
 
-El proyecto se estructura en dos directorios principales ( frontend-ia y backend ). Debes instalar las dependencias por separado para cada uno.
+El proyecto se estructura en dos directorios principales ( frontend/frontend-ia y backend ). Debes instalar las dependencias por separado para cada uno.
 
 1. Configuración del backend (API de Python)
-El backend exponen el endpoint /generateque será consumido por el frontend.
+El backend expone el endpoint /generate que será consumido por el frontend.
 
 1. Navegar al directorio del Backend:
 
@@ -44,7 +44,7 @@ si usas pip:
 
 3. Configurar Variables de Entorno (Opcional pero recomendado):
 
-Crea un archivo .enven el directorio raíz del backend y define variables sensibles (ej., claves API, URL de bases de datos, etc.).
+Crea un archivo .env en el directorio raíz del backend y define variables sensibles (ej., claves API, URL de bases de datos, etc.).
 
 2. Configuración del Frontend (Aplicación React)
 El frontend contiene el código de la interfaz de usuario.
@@ -72,9 +72,9 @@ Asegúrese de que la URL del backend en el archivo useChatLogic.js sea correcta 
 Para que la aplicación funcione completamente, debes ejecutar el backend y el frontend simultáneamente en dos terminales separados.
 
 ### Paso 1: Iniciar el Servidor del Backend
-Abra la primera terminal y navegue al directorio del backend ( backend/ ).
+- Abra la primera terminal y navegue al directorio del backend ( backend/ ).
 
-Ejecuta el servidor (el comando exacto puede variar según el framework que uses, como FastAPI):
+- Ejecuta el servidor (el comando exacto puede variar según el framework que uses, como FastAPI):
 
     uvicorn backend.app:app --reload --port 8000
 
