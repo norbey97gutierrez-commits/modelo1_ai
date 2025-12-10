@@ -76,9 +76,7 @@ Abra la primera terminal y navegue al directorio del backend ( backend/ ).
 
 Ejecuta el servidor (el comando exacto puede variar según el framework que uses, como FastAPI):
 
-    ```sh
-    uvicorn main:app --reload --port 8000
-    ```
+    uvicorn backend.app:app --reload --port 8000
 
 (Verifique la documentación de su servidor si el comando es diferente.)
 
