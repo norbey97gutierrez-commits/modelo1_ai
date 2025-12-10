@@ -30,17 +30,17 @@ El backend expone el endpoint /generate que será consumido por el frontend.
 
 1. Navegar al directorio del Backend:
 
-    ```sh
+```sh
     cd backend/
-    ```
+```
 
 2. Instalar dependencias de Python:
 
 si usas pip:
 
-    ```sh
-        pip install -r requirements.txt
-    ```
+```sh
+    pip install -r requirements.txt
+```
 
 3. Configurar Variables de Entorno (Opcional pero recomendado):
 
@@ -51,16 +51,16 @@ El frontend contiene el código de la interfaz de usuario.
 
 1. Navegar al directorio del Frontend:
 
-    ```sh
-        cd frontend/
-        cd frontend-ia/
-    ```
+```sh
+    cd frontend/
+    cd frontend-ia/
+```
 
 2. Instalar dependencias de Node:
 
-    ```sh
-        npm install 
-    ```
+```sh
+    npm install 
+```
 
 3. Asegurar la conexión al Backend:
 
@@ -85,9 +85,9 @@ Para que la aplicación funcione completamente, debes ejecutar el backend y el f
 1. Abra la segunda terminal y navegue al directorio del frontend ( frontend/frontend-ia/).
 2. Ejecuta el comando de desarrollo de React (usando Vite o Create React App):
 
-    ```sh
-        npm run dev
-    ```
+```sh
+    npm run dev
+```
 3. Acceder a la Aplicación:
 La aplicación React estará disponible en tu navegador, generalmente en: http://localhost:5173/(o el puerto que indica tu terminal).
 
