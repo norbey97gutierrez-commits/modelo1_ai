@@ -38,9 +38,10 @@ El backend exponen el endpoint /generateque será consumido por el frontend.
 
 si usas pip:
 
-        ```sh
+    ```sh
         pip install -r requirements.txt
-        ```
+    ```
+
 3. Configurar Variables de Entorno (Opcional pero recomendado):
 
 Crea un archivo .enven el directorio raíz del backend y define variables sensibles (ej., claves API, URL de bases de datos, etc.).
@@ -76,8 +77,9 @@ Abra la primera terminal y navegue al directorio del backend ( backend/ ).
 Ejecuta el servidor (el comando exacto puede variar según el framework que uses, como FastAPI):
 
     ```sh
-        uvicorn main:app --reload --port 8000
+    uvicorn main:app --reload --port 8000
     ```
+
 (Verifique la documentación de su servidor si el comando es diferente.)
 
 ### Paso 2: Iniciar el Servidor de Desarrollo del Frontend
@@ -97,8 +99,9 @@ La aplicación sigue una arquitectura limpia para la fácil escalabilidad:
 
 | Directorio/Archivo               | Descripción                                                             |
 |----------------------------------|-------------------------------------------------------------------------|
-| 📂 `backend-id/`                 | Servidor API, lógica de IA y modelos                                    |
-| 📂 `frontend-id/`                | Aplicación React                                                        |
+| 📂 `backend/`                 | Servidor API, lógica de IA y modelos                                    |
+| 📂 `frontend/`                   | Aplicación React    
+| 📂  frontend-ia/                 | Paquete de las carpetas del sistema
 | 📄 `frontend-id/src/App.jsx`     | Componente principal - contenedor de diseño                             |
 | 📂 `frontend-id/src/hooks/`      | Custom Hooks (`useChatLogic.js`)                                        |
 | 📂 `frontend-id/src/components/` | Componentes UI (`Mensaje.jsx`, `ChatInput.jsx`, etc.)                   |
@@ -107,11 +110,11 @@ La aplicación sigue una arquitectura limpia para la fácil escalabilidad:
 
 ## 🎨 Características adicionales
 
-Diseño Oscuro (Dark Mode): Interfaz optimizada para ambientes de poca luz.
+- Diseño Oscuro (Dark Mode): Interfaz optimizada para ambientes de poca luz.
 
-Diseño Modular: Componentes separados para alta mantenibilidad.
+- Diseño Modular: Componentes separados para alta mantenibilidad.
 
-Scroll Automático: La conversación se desplaza automáticamente al recibir una nueva respuesta.
+- Scroll Automático: La conversación se desplaza automáticamente al recibir una nueva respuesta.
 
-Manejo de Carga: Indicadores de "Cargando..." y manejo de errores de conexión.
+- Manejo de Carga: Indicadores de "Cargando..." y manejo de errores de conexión.
 
