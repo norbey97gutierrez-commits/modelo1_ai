@@ -14,11 +14,11 @@ El sistema está dividido en dos partes:
 
 Antes de comenzar, asegúrese de tener instalado lo siguiente:
 
-    Node.js y npm/yarn: Para ejecutar la aplicación React (Frontend).
+- Node.js y npm/yarn: Para ejecutar la aplicación React (Frontend).
 
-    Python (3.8+): Para ejecutar la API del servidor (Backend).
+- Python (3.8+): Para ejecutar la API del servidor (Backend).
 
-    pip (o pipenv/poetry): Para gestionar las dependencias de Python.
+- pip (o pipenv/poetry): Para gestionar las dependencias de Python.
 
 
 ## 🚀 Instalación y configuración
