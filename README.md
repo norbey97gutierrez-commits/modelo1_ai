@@ -6,9 +6,9 @@ Este proyecto es una aplicación web de chat que funciona como un asistente conv
 
 El sistema está dividido en dos partes:
 
-    1. Frontend (React+vitae): Interfaz de usuario moderna y responsiva.
+1. Frontend (React+vitae): Interfaz de usuario moderna y responsiva.
 
-    2. Backend (Python/Uvicorn/FastAPI): Servidor API que maneja la lógica de la inteligencia artificial y genera respuestas a las consultas.
+2. Backend (Python/Uvicorn/FastAPI): Servidor API que maneja la lógica de la inteligencia artificial y genera respuestas a las consultas.
 
 ## 🛠️ Requisitos previos
 
@@ -28,42 +28,42 @@ El proyecto se estructura en dos directorios principales ( frontend-ia y backend
 1. Configuración del backend (API de Python)
 El backend exponen el endpoint /generateque será consumido por el frontend.
 
-    1. Navegar al directorio del Backend:
+1. Navegar al directorio del Backend:
 
     ```sh
     cd backend/
     ```
 
-    2. Instalar dependencias de Python:
+2. Instalar dependencias de Python:
 
-        Si usas pip:
+si usas pip:
 
         ```sh
         pip install -r requirements.txt
         ```
-    3. Configurar Variables de Entorno (Opcional pero recomendado):
+3. Configurar Variables de Entorno (Opcional pero recomendado):
 
-        Crea un archivo .enven el directorio raíz del backend y define variables sensibles (ej., claves API, URL de bases de datos, etc.).
+Crea un archivo .enven el directorio raíz del backend y define variables sensibles (ej., claves API, URL de bases de datos, etc.).
 
 2. Configuración del Frontend (Aplicación React)
 El frontend contiene el código de la interfaz de usuario.
 
-    1. Navegar al directorio del Frontend:
+1. Navegar al directorio del Frontend:
 
     ```sh
         cd frontend/
         cd frontend-ia/
     ```
 
-    2. Instalar dependencias de Node:
+2. Instalar dependencias de Node:
 
     ```sh
         npm install 
     ```
 
-    3. Asegurar la conexión al Backend:
+3. Asegurar la conexión al Backend:
 
-    Asegúrese de que la URL del backend en el archivo useChatLogic.js sea correcta (por defecto http://localhost:8000/generate).
+Asegúrese de que la URL del backend en el archivo useChatLogic.js sea correcta (por defecto http://localhost:8000/generate).
 
 
 ## ▶️ Ejecución de la Aplicación
@@ -71,25 +71,25 @@ El frontend contiene el código de la interfaz de usuario.
 Para que la aplicación funcione completamente, debes ejecutar el backend y el frontend simultáneamente en dos terminales separados.
 
 ### Paso 1: Iniciar el Servidor del Backend
-    Abra la primera terminal y navegue al directorio del backend ( backend/ ).
+Abra la primera terminal y navegue al directorio del backend ( backend/ ).
 
-    Ejecuta el servidor (el comando exacto puede variar según el framework que uses, como FastAPI):
+Ejecuta el servidor (el comando exacto puede variar según el framework que uses, como FastAPI):
 
     ```sh
         uvicorn main:app --reload --port 8000
     ```
-    (Verifique la documentación de su servidor si el comando es diferente.)
+(Verifique la documentación de su servidor si el comando es diferente.)
 
 ### Paso 2: Iniciar el Servidor de Desarrollo del Frontend
 
-    1. Abra la segunda terminal y navegue al directorio del frontend ( frontend/frontend-ia/).
-    2. Ejecuta el comando de desarrollo de React (usando Vite o Create React App):
+1. Abra la segunda terminal y navegue al directorio del frontend ( frontend/frontend-ia/).
+2. Ejecuta el comando de desarrollo de React (usando Vite o Create React App):
 
     ```sh
         npm run dev
     ```
-    3. Acceder a la Aplicación:
-    La aplicación React estará disponible en tu navegador, generalmente en: http://localhost:5173/(o el puerto que indica tu terminal).
+3. Acceder a la Aplicación:
+La aplicación React estará disponible en tu navegador, generalmente en: http://localhost:5173/(o el puerto que indica tu terminal).
 
 ## 📁 Estructura del Proyecto
 
@@ -105,20 +105,13 @@ La aplicación sigue una arquitectura limpia para la fácil escalabilidad:
 | 🎨 `frontend-id/src/App.css`     | Estilos globales y variables CSS                                        |
 
 
-├── 📂 backend-id/           # Servidor API, lógica IA y modelos
-├── 📂 frontend-id/          # Aplicación React
-│   ├── 📄 src/App.jsx       # Componente principal
-│   ├── 📂 src/hooks/        # Custom Hooks
-│   ├── 📂 src/components/   # Componentes UI
-│   └── 🎨 src/App.css       # Estilos globales
-
 ## 🎨 Características adicionales
 
-    Diseño Oscuro (Dark Mode): Interfaz optimizada para ambientes de poca luz.
+Diseño Oscuro (Dark Mode): Interfaz optimizada para ambientes de poca luz.
 
-    Diseño Modular: Componentes separados para alta mantenibilidad.
+Diseño Modular: Componentes separados para alta mantenibilidad.
 
-    Scroll Automático: La conversación se desplaza automáticamente al recibir una nueva respuesta.
+Scroll Automático: La conversación se desplaza automáticamente al recibir una nueva respuesta.
 
-    Manejo de Carga: Indicadores de "Cargando..." y manejo de errores de conexión.
+Manejo de Carga: Indicadores de "Cargando..." y manejo de errores de conexión.
 
