@@ -15,10 +15,18 @@ def generate_ai_response(request: PromptRequest):
     """
     try:
         pregunta_usuario = request.prompt
-        # Llama a la lógica de negocio Servicio de IA
-        respuesta_ia = assistant_service.generate_response(pregunta_usuario)
-        # Retorna el esquema de respuesta validado por Pydantic
-        return {"pregunta": pregunta_usuario, "respuesta_generada": respuesta_ia}
+
+        # Llama al servicio, que devuelve un objeto SoftwareDevAnalysis
+        analisis_ia_obj = assistant_service.generate_response(pregunta_usuario)
+
+        # Convertimos el objeto Pydantic devuelto por LangChain a un string JSON.
+        # .json() es un método de Pydantic que hace esto eficientemente.
+        respuesta_json_str = analisis_ia_obj.json()
+
+        # Retorna el esquema de respuesta validado por la API
+        return AIResponse(
+            pregunta=pregunta_usuario, respuesta_generada=respuesta_json_str
+        )
     except Exception as e:
         # Capturamos errores específicos (Azure/LangChain)
         print(f"Error al procesar la solicitud en el servicio de IA: {e}")

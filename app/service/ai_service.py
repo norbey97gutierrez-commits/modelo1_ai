@@ -1,8 +1,9 @@
-from langchain.chains import LLMChain
+from langchain.chains.structured_output import create_structured_output_chain
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
 
 from app.core.config import config
+from app.core.settings import SoftwareDevAnalysis
 
 
 class SoftwareDevAssistant:
@@ -25,23 +26,24 @@ class SoftwareDevAssistant:
             input_variables=["pregunta"],
             template=(
                 "Eres un experto en desarrollo de software y arquitectura de sistemas. "
-                "Tu objetivo es ayudar a un desarrollador con su consulta, proporcionando "
-                "código claro, mejores prácticas y explicaciones concisas. Responde a la siguiente consulta: {pregunta}"
+                "Tu objetivo es analizar la siguiente consulta: '{pregunta}'. "
+                "Basado en ella, sugiere un rol, habilidades y una justificación."
             ),
         )
 
-        self.cadena = LLMChain(
-            prompt=self.template,  # Le pasamos el PromptTemplate
-            llm=self.llm,  # Le pasamos la instancia del modelo de chat
-            verbose=False,
+        # LLMChain para encadenamiento
+        self.cadena = create_structured_output_chain(
+            output_schema=SoftwareDevAnalysis,  # Le pasamos el esquema Pydantic deseado
+            llm=self.llm,
+            prompt=self.template,
         )
 
-    def generate_response(self, consulta: str) -> str:
+    def generate_response(self, consulta: str) -> SoftwareDevAnalysis:
         """
-        Ejecuta la cadena de LangChain y devuelve el contenido de la respuesta.
-        Lógica desacoplada de FastAPI.
+        Ejecuta la cadena y devuelve el objeto Pydantic SoftwareDevAnalysis.
         """
-        return self.cadena.invoke({"pregunta": consulta}).content
+        response = self.cadena.invoke({"pregunta": consulta})
+        return response["output"]
 
 
 # Instancia Singleton
