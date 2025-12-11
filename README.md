@@ -30,9 +30,7 @@ El backend expone el endpoint /generate que será consumido por el frontend.
 
 1. Navegar al directorio del Backend:
 
-```sh
-    cd backend/
-```
+    ia-level1
 
 2. Instalar dependencias de Python:
 
@@ -72,7 +70,7 @@ Asegúrese de que la URL del backend en el archivo useChatLogic.js sea correcta 
 Para que la aplicación funcione completamente, debes ejecutar el backend y el frontend simultáneamente en dos terminales separados.
 
 ### Paso 1: Iniciar el Servidor del Backend
-- Abra la primera terminal y navegue al directorio del backend ( backend/ ).
+- Abra la primera terminal y navegue al directorio del backend ( ia-level1/ ).
 
 - Ejecuta el servidor (el comando exacto puede variar según el framework que uses, como FastAPI):
 
