@@ -24,7 +24,7 @@ class SoftwareDevAnalysis(BaseModel):
     """
 
     rol_sugerido: str = Field(
-        description="Un solo rol profesional sugerido basado en la consulta del usuario (Ej: 'Ingeniero Backend Senior')."
+        description="Un solo rol profesional sugerido basado en la consulta del usuario."
     )
     habilidades_clave: List[str] = Field(
         description="Una lista de 3 a 5 habilidades técnicas esenciales para el rol sugerido."

@@ -1,5 +1,3 @@
-# app/main.py
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,12 +8,12 @@ from app.core.config import ALLOWED_ORIGINS
 def create_app() -> FastAPI:
     """Crea y configura la instancia de la aplicación FastAPI."""
     app = FastAPI(
-        title="Software Development AI Assistant API",
+        title="Software Development AI Assistant",
         description="Backend escalable y mantenible para un modelo de IA experto en desarrollo.",
         version="1.0.0",
     )
 
-    # 1. Configuración de Middleware (CORS)
+    # Configuración de Middleware (CORS)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=ALLOWED_ORIGINS,
