@@ -1,6 +1,15 @@
+from functools import lru_cache
+
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
+from openai import APIError, RateLimitError
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from app.core.config import config
 from app.core.settings import SoftwareDevAnalysis
@@ -43,12 +52,25 @@ class SoftwareDevAssistant:
         # El parser se encarga de convertir la salida de texto del LLM a un objeto SoftwareDevAnalysis.
         self.cadena = self.template | self.llm | self.parser
 
+    # Aplicamos la lógica de reintentos (DECORADOR DE TENACITY)
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type((APIError, RateLimitError)),
+        reraise=True,  # Vuelve a lanzar la excepción si los 3 intentos fallan.
+    )
+    # Usamos almacenamiento en cache para preguntas repetitivas con (lru_cache)
+    @lru_cache(maxsize=32)
     def generate_response(self, consulta: str) -> SoftwareDevAnalysis:
         """
-        Ejecuta la cadena LCEL y devuelve el objeto Pydantic SoftwareDevAnalysis directamente.
+        Ejecuta la cadena LCEL y devuelve el objeto Pydantic SoftwareDevAnalysis.
+        La función está cacheada: si la misma 'consulta' entra dos veces,
+        la segunda vez se devuelve la respuesta instantáneamente desde la memoria.
         """
-        return self.cadena.invoke({"pregunta": consulta})
+        print(f"INFO: Consultando Azure OpenAI para la pregunta: {consulta}")
 
+        # La cadena LCEL se ejecuta solo si la consulta no está en caché.
+        structured_data = self.cadena.invoke({"pregunta": consulta})
 
-# Instancia Singleton
-assistant_service = SoftwareDevAssistant()
+        # Devolvemos el resultado (que se guarda automáticamente en caché)
+        return structured_data
