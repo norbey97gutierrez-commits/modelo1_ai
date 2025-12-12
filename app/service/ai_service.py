@@ -1,5 +1,7 @@
+import json
 from functools import lru_cache
 
+from langchain_core.exceptions import OutputParserException
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
@@ -53,24 +55,54 @@ class SoftwareDevAssistant:
         self.cadena = self.template | self.llm | self.parser
 
     # Aplicamos la lógica de reintentos (DECORADOR DE TENACITY)
+    # para la conexion de OpenAI
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=2, max=10),
-        retry=retry_if_exception_type((APIError, RateLimitError)),
+        retry=retry_if_exception_type(
+            (APIError, RateLimitError, OutputParserException)
+        ),
         reraise=True,  # Vuelve a lanzar la excepción si los 3 intentos fallan.
     )
     # Usamos almacenamiento en cache para preguntas repetitivas con (lru_cache)
     @lru_cache(maxsize=32)
     def generate_response(self, consulta: str) -> SoftwareDevAnalysis:
         """
-        Ejecuta la cadena LCEL y devuelve el objeto Pydantic SoftwareDevAnalysis.
-        La función está cacheada: si la misma 'consulta' entra dos veces,
-        la segunda vez se devuelve la respuesta instantáneamente desde la memoria.
+        Ejecuta la cadena LCEL con lógica de reintentos para manejar fallas de API y de parseo.
         """
-        print(f"INFO: Consultando Azure OpenAI para la pregunta: {consulta}")
+        print(f"INFO: Intentando consultar Azure OpenAI para la pregunta: {consulta}")
 
-        # La cadena LCEL se ejecuta solo si la consulta no está en caché.
-        structured_data = self.cadena.invoke({"pregunta": consulta})
+        try:
+            # La cadena LCEL se ejecuta. Si el JSON es malo, lanza OutputParserException.
+            structured_data = self.cadena.invoke({"pregunta": consulta})
 
-        # Devolvemos el resultado (que se guarda automáticamente en caché)
-        return structured_data
+            # Si llega aquí, la validación del parser fue exitosa.
+            return structured_data
+
+        except OutputParserException as e:
+            # 2. Lógica Defensiva: Si el parseo falla (JSON malo)
+            print(
+                "ADVERTENCIA: Falló el parseo automático. Intentando limpieza manual..."
+            )
+
+            # El mensaje de error de LangChain a menudo incluye el JSON crudo fallido.
+            # Intentamos aislar el JSON crudo del error para forzar la carga.
+            try:
+                # Esta línea intenta encontrar el JSON entre comillas o bloques de texto
+                # Es un intento heurístico, no 100% garantizado, pero es una buena defensa.
+                raw_json_string = e.response.split("```json")[1].split("```")[0].strip()
+
+                # Intentamos cargar el JSON manualmente
+                cleaned_dict = json.loads(raw_json_string)
+
+                # Si se carga, lo convertimos a la clase Pydantic y lo devolvemos
+                # Esto evita que el reintento tenga que llamar a Azure de nuevo.
+                return SoftwareDevAnalysis.parse_obj(cleaned_dict)
+
+            except (IndexError, json.JSONDecodeError, AttributeError, KeyError):
+                # 3. Si la limpieza manual falla, elevamos la excepción original.
+                # El decorador @retry capturará esto y lo intentará de nuevo (Reintento Curativo).
+                print(
+                    "ADVERTENCIA: La limpieza manual falló. Reintentando la llamada completa a Azure..."
+                )
+                raise e

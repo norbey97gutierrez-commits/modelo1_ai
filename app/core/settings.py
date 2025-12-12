@@ -4,31 +4,33 @@ from pydantic import BaseModel, Field
 
 
 class PromptRequest(BaseModel):
-    """Define el esquema de entrada para la consulta del usuario."""
-
     prompt: str
 
 
-class AIResponse(BaseModel):
-    """Define el esquema de salida de la respuesta de la IA."""
-
-    pregunta: str
-    respuesta_generada: str
-
-
-# Esquemas de Salida ESTRUCTURADA para LangChain
-class SoftwareDevAnalysis(BaseModel):
+# Esquema de Salida para DESARROLLO DE SOFTWARE UNIVERSAL
+class SoftwareSolution(BaseModel):
     """
-    Define el esquema de Pydantic que la IA debe rellenar.
-    Este es el formato de Salida Estructurada.
+    Define el esquema para una solución de software completa.
     """
 
-    rol_sugerido: str = Field(
-        description="Un solo rol profesional sugerido basado en la consulta del usuario."
+    proyecto_nombre: str = Field(
+        description="Nombre breve del módulo o funcionalidad desarrollada."
     )
-    habilidades_clave: List[str] = Field(
-        description="Una lista de 3 a 5 habilidades técnicas esenciales para el rol sugerido."
+    lenguaje: str = Field(
+        description="Lenguaje de programación utilizado (ej. Python, Rust, TypeScript)."
     )
-    justificacion_rol: str = Field(
-        description="Una justificación concisa de por qué el rol es el más adecuado para la consulta en un solo párrafo."
+    framework: str = Field(
+        description="Framework utilizado o 'None' si es código puro."
+    )
+    estructura_archivos: List[str] = Field(
+        description="Lista de archivos necesarios para implementar la solución."
+    )
+    codigo_principal: str = Field(
+        description="El código fuente principal generado. Debe ser código crudo, listo para guardar."
+    )
+    explicacion_tecnica: str = Field(
+        description="Explicación detallada de la arquitectura y lógica utilizada."
+    )
+    dependencias: List[str] = Field(
+        description="Lista de librerías o paquetes externos necesarios (ej. npm install X, pip install Y)."
     )
