@@ -1,7 +1,6 @@
 import json
 from functools import lru_cache
 
-# Importaciones de LangChain y OpenAI
 from langchain_core.exceptions import OutputParserException
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
@@ -15,7 +14,7 @@ from tenacity import (
 )
 
 from app.core.config import config
-from app.core.settings import SoftwareSolution  # Importamos el nuevo modelo de solución
+from app.core.settings import SoftwareSolution
 
 
 class SoftwareArchitectAssistant:
@@ -29,7 +28,7 @@ class SoftwareArchitectAssistant:
             azure_deployment=config.AZURE_OPENAI_DEPLOYMENT_NAME,
             api_key=config.AZURE_OPENAI_API_KEY,
             openai_api_version=config.AZURE_OPENAI_API_VERSION,
-            temperature=0.2,  # Subimos ligeramente para permitir creatividad en el código
+            temperature=0.2,
         )
 
         self.parser = JsonOutputParser(pydantic_object=SoftwareSolution)
@@ -86,8 +85,6 @@ class SoftwareArchitectAssistant:
 
                 cleaned_dict = json.loads(raw_json_string)
 
-                # ✅ CORRECCIÓN AQUÍ: Usamos model_validate para compatibilidad con Pydantic v2
                 return SoftwareSolution.model_validate(cleaned_dict)
             except Exception:
-                # Si el parseo manual falla, relanzamos la excepción original.
                 raise e

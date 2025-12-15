@@ -2,10 +2,9 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 
-# Importamos las clases necesarias. NOTA: AIResponse debe ser revisado en settings.py
 from app.core.settings import PromptRequest, SoftwareSolution
 from app.service.ai_service import (
-    SoftwareArchitectAssistant,  # Importamos el nuevo nombre de la clase
+    SoftwareArchitectAssistant,
 )
 
 # Obtenemos la instancia del logger para este módulo
@@ -15,11 +14,10 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Variable para almacenar la instancia del servicio de IA (Singleton)
-# Usamos el nuevo nombre de la clase
 _assistant_service_instance: SoftwareArchitectAssistant | None = None
 
 
-# Función de Inyección de Dependencias (El Getter del Singleton)
+# Función de Inyección de Dependencias
 def get_assistant_service() -> SoftwareArchitectAssistant:
     """
     Crea o devuelve la instancia Singleton del SoftwareArchitectAssistant.
@@ -32,9 +30,7 @@ def get_assistant_service() -> SoftwareArchitectAssistant:
     return _assistant_service_instance
 
 
-# NOTA: La respuesta de salida es la Pydantic original que maneja el JSON.
-# Si estás usando una clase AIResponse para manejar la salida del JSON,
-# asegúrate de que exista y que su campo `respuesta_generada` sea un string.
+# ENDPOINT
 @router.post("/generate", response_model=SoftwareSolution)
 def generate_ai_response(
     request: PromptRequest,
@@ -43,7 +39,6 @@ def generate_ai_response(
     pregunta_usuario = request.prompt
 
     try:
-        # solucion_ia_obj ya es una instancia de SoftwareSolution
         solucion_ia_obj: SoftwareSolution = assistant_service.generate_code_solution(
             pregunta_usuario
         )

@@ -30,7 +30,7 @@ def configure_json_logging():
     handler.setFormatter(json_formatter)
 
     # Establecemos el nivel mínimo y añadir el handler al logger raíz
-    root.setLevel(logging.INFO)  # Capturamos INFO, WARNING, ERROR, CRITICAL
+    root.setLevel(logging.INFO)
     root.addHandler(handler)
 
 
@@ -69,7 +69,7 @@ def create_app() -> FastAPI:
 # Instancia de la aplicación
 app = create_app()
 
-# Ejecuor de la app
+# Ejecutor de la app
 if __name__ == "__main__":
     import uvicorn
 
