@@ -1,12 +1,15 @@
+from datetime import timedelta
 from typing import Optional
 
-# Importaciones de la Lógica de Negocio y Core
-from app.database.db import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.security import create_access_token
 from app.core.settings import settings  # Para acceder al tiempo de expiración del token
+
+# Importaciones de la Lógica de Negocio y Core
+from app.database.db import get_db
 from app.service.auth_service import AuthService
 
 # Creamos el router para la autenticación

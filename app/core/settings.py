@@ -14,9 +14,7 @@ class Settings(BaseSettings):
     # ===============================================
 
     # Clave secreta para firmar los JWTs. Debe ser SECRETA y cargarse desde .env
-    JWT_SECRET_KEY: str = os.getenv(
-        "JWT_SECRET_KEY", "clave_segura_de_fallback_cambiar_en_produccion"
-    )
+    JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY")
     # Tiempo de expiración del token (en minutos)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 1 semana
 

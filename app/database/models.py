@@ -1,110 +1,85 @@
+# app/database/models.py
+
+import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from sqlalchemy import JSON, Column, DateTime, ForeignKey, String
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy.orm import relationship
 
-# ===============================================
-# A. ESQUEMAS DE GENERACIÓN DE IA (Software Solution)
-# ===============================================
-
-
-class PromptRequest(BaseModel):
-    """Esquema de entrada para el endpoint de generación."""
-
-    prompt: str
-
-
-class SoftwareSolution(BaseModel):
-    """
-    Define el esquema para la salida estructurada del modelo de IA.
-    Este esquema se usa para la validación y tipado de la respuesta de la IA.
-    """
-
-    proyecto_nombre: str = Field(
-        description="Nombre breve del módulo o funcionalidad desarrollada."
-    )
-    lenguaje: str = Field(
-        description="Lenguaje de programación utilizado (ej. Python, JavaScript)."
-    )
-    framework: str = Field(
-        description="Framework utilizado o 'None' si es código puro."
-    )
-    estructura_archivos: List[str] = Field(
-        description="Lista de archivos necesarios para implementar la solución."
-    )
-    codigo_principal: str = Field(description="El código fuente principal generado.")
-    explicacion_tecnica: str = Field(
-        description="Explicación detallada de la arquitectura y lógica utilizada (Markdown)."
-    )
-    dependencias: List[str] = Field(
-        description="Lista de librerías o paquetes externos necesarios (ej. npm install X, pip install Y)."
-    )
-
+# ⚠️ Asumiendo que Base está definida en db.py, la importamos.
+# Si Base está definida aquí, asegúrate de que db.py la use.
+from app.database.db import Base
 
 # ===============================================
-# B. ESQUEMAS DE AUTENTICACIÓN Y USUARIO
+# 1. MODELO DE USUARIO (Tabla 'users')
 # ===============================================
 
 
-class UserBase(BaseModel):
-    """Esquema base para la información mínima del usuario."""
+class User(Base):
+    """Modelo ORM para la tabla de usuarios."""
 
-    email: str
-    name: Optional[str] = None
-    picture: Optional[str] = None  # URL de la imagen de perfil de Google
+    __tablename__ = "users"
 
+    # id es el sub claim de Google, un identificador largo de string.
+    # Usamos String, ya que el ID de Google no es un UUID estándar de la DB.
+    id = Column(String, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    name = Column(String, nullable=True)
+    picture = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
-class User(UserBase):
-    """Esquema completo del usuario (lo que se almacena en la BD y se devuelve)."""
-
-    id: str  # ID único de Google (sub claim)
-
-    class Config:
-        # Permite la conversión desde modelos ORM (necesario para FastAPI)
-        from_attributes = True
+    # Relación con las conversaciones: Un usuario tiene muchas conversaciones.
+    conversations = relationship("Conversation", back_populates="user")
 
 
 # ===============================================
-# C. ESQUEMAS DE HISTORIAL (Conversación y Mensajes)
+# 2. MODELO DE CONVERSACIÓN (Tabla 'conversations')
 # ===============================================
 
 
-class Message(BaseModel):
-    """
-    Define la estructura de un mensaje individual en la conversación.
-    Incluye un campo opcional para la data estructurada de la IA.
-    """
+class Conversation(Base):
+    """Modelo ORM para la tabla de conversaciones."""
 
-    id: Optional[str] = None
-    tipo: str  # 'usuario' o 'ia'
-    texto: str
-    timestamp: datetime = Field(default_factory=datetime.now)
+    __tablename__ = "conversations"
 
-    # 🆕 Campo Opcional: Almacena la data estructurada de la IA si existe.
-    # Usamos Dict[str, Any] o SoftwareSolution.dict() si se asegura la conversión.
-    data_ia: Optional[Dict[str, Any]] = None
+    # Usamos UUID generado por Python/PostgreSQL como ID primario.
+    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    title = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-
-class Conversation(BaseModel):
-    """Define el esquema de una conversación completa."""
-
-    id: Optional[str] = None  # ID único de la conversación
-    user_id: str  # Clave foránea al usuario
-    title: str  # Primer mensaje del usuario (título)
-    messages: List[Message]
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now)
-
-    class Config:
-        from_attributes = True
+    # Relaciones
+    user = relationship("User", back_populates="conversations")
+    messages = relationship(
+        "Message", back_populates="conversation", order_by="Message.timestamp"
+    )
 
 
-class ConversationSummary(BaseModel):
-    """Esquema para la lista de historial que se muestra en la Sidebar."""
+# ===============================================
+# 3. MODELO DE MENSAJE (Tabla 'messages')
+# ===============================================
 
-    id: str
-    title: str
-    date: datetime = Field(alias="updated_at")
 
-    class Config:
-        from_attributes = True
+class Message(Base):
+    """Modelo ORM para la tabla de mensajes."""
+
+    __tablename__ = "messages"
+
+    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    conversation_id = Column(
+        PG_UUID(as_uuid=True),
+        ForeignKey("conversations.id"),
+        nullable=False,
+        index=True,
+    )
+    tipo = Column(String, nullable=False)  # 'usuario' o 'ia'
+    texto = Column(String, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    # El campo data_ia guarda la respuesta estructurada del modelo de IA (JSON).
+    data_ia = Column(JSON, nullable=True)
+
+    # Relación
+    conversation = relationship("Conversation", back_populates="messages")

@@ -16,7 +16,7 @@ from tenacity import (
 from app.core.settings import settings  # Usamos 'settings' si necesitas configuraciones
 
 # Asumimos que SoftwareSolution está en schemas.py para tipado
-from app.database.models import SoftwareSolution
+from app.database.schemas import SoftwareSolution
 
 
 class SoftwareArchitectAssistant:

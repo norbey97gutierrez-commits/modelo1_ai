@@ -4,12 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.security import get_current_user  # 🔒 Para proteger el endpoint
+from app.database.db import get_db
 
 # Importaciones de Core, DB y Servicios
-from app.core.settings import SoftwareSolution
-from app.database.db import get_db
-from app.database.models import (
+from app.database.schemas import (
     ChatRequest,  # 🆕 Nuevo esquema de entrada
+    SoftwareSolution,
     User,  # Para el usuario autenticado
 )
 from app.service.ai_service import SoftwareArchitectAssistant

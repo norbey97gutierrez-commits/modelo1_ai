@@ -1,8 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-# Importamos la función de dependencia de la BD
-from app.database.db import get_db
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -14,7 +12,10 @@ from app.core.settings import settings
 
 # Importamos el modelo ORM del Usuario
 # Importamos el esquema del usuario para la salida
-from app.database import models, schemas
+from app.database import models
+
+# Importamos la función de dependencia de la BD
+from app.database.db import get_db
 
 # --- Configuración JWT ---
 
@@ -69,7 +70,7 @@ def decode_access_token(token: str) -> Optional[TokenData]:
 
 async def get_current_user(
     db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
-) -> schemas.User:
+) -> models.User:
     """
     Dependencia de FastAPI para obtener el usuario autenticado a partir del JWT.
     Lanza HTTPException 401 si la autenticación falla.
@@ -98,4 +99,4 @@ async def get_current_user(
         raise credentials_exception
 
     # 3. Devolver el usuario (convertido a esquema Pydantic para tipado)
-    return schemas.User.model_validate(db_user)
+    return models.User.model_validate(db_user)
