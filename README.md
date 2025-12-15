@@ -42,7 +42,9 @@ Archivo .env
 2. Instalación de Dependencias
 Ejecuta el siguiente comando para instalar todas las librerías necesarias de Python:
 
+```sh
     pip install -r requirements.txt
+```
 
 ## ▶️ Ejecución de la API
 Para iniciar el servidor de la API utilizando Uvicorn:
