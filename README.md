@@ -1,4 +1,4 @@
-# 🧠 Backend | AI Architect Assistant API
+# 🧠 Backend | AI Arquitecto y desarrollador de software API
 
 API de lógica de negocio construida en **Python** para gestionar la comunicación con los modelos de lenguaje (LLMs) y estructurar las respuestas antes de enviarlas al frontend.
 
