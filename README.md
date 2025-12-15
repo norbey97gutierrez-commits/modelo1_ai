@@ -19,7 +19,7 @@ El proyecto sigue una arquitectura modular separada en capas:
     * `ai_service.py`: Contiene la lógica de negocio pura. Aquí se orquesta la llamada al modelo de IA, la gestión del historial de la conversación y, crucialmente, la función de **estructuración** de la respuesta del LLM a un formato JSON compatible con el frontend.
 
 3.  **Capa Core (`app/core`):**
-    * `config.py` / `settings.py`: Manejo de la configuración global, incluyendo la carga de variables de entorno (como la clave de la API de Gemini, por ejemplo).
+    * `config.py` / `settings.py`: Manejo de la configuración global, incluyendo la carga de variables de entorno (como la clave de la API de AzureOpenAI, por ejemplo).
 
 4.  **Raíz:**
     * `main.py`: Punto de entrada principal de la aplicación (Uvicorn/FastAPI).
