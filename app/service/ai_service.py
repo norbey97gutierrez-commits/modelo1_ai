@@ -1,5 +1,6 @@
 import json
 
+# Importaciones de LangChain y OpenAI
 from langchain_core.exceptions import OutputParserException
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
@@ -12,11 +13,8 @@ from tenacity import (
     wait_exponential,
 )
 
-# ⚠️ Importaciones ajustadas a tu estructura de Core y Database
-from app.core.settings import settings  # Usamos 'settings' si necesitas configuraciones
-
-# Asumimos que SoftwareSolution está en schemas.py para tipado
-from app.database.schemas import SoftwareSolution
+from app.core.config import config
+from app.core.settings import SoftwareSolution
 
 
 class SoftwareArchitectAssistant:
@@ -27,10 +25,10 @@ class SoftwareArchitectAssistant:
     def __init__(self):
         # Inicialización del LLM
         self.llm = AzureChatOpenAI(
-            azure_endpoint=settings.AZURE_OPENAI_ENDPOINT,
-            azure_deployment=settings.AZURE_OPENAI_DEPLOYMENT_NAME,
-            api_key=settings.AZURE_OPENAI_API_KEY,
-            openai_api_version="2024-02-15",  # Ajusta la versión API si es necesario
+            azure_endpoint=config.AZURE_OPENAI_ENDPOINT,
+            azure_deployment=config.AZURE_OPENAI_DEPLOYMENT_NAME,
+            api_key=config.AZURE_OPENAI_API_KEY,
+            openai_api_version=config.AZURE_OPENAI_API_VERSION,
             temperature=0.2,
         )
 
@@ -99,8 +97,8 @@ class SoftwareArchitectAssistant:
                 # Cargar el JSON limpio y validarlo contra el esquema
                 cleaned_dict = json.loads(raw_json_string)
 
+                # ✅ CORRECCIÓN AQUÍ: Usamos model_validate para compatibilidad con Pydantic v2
                 return SoftwareSolution.model_validate(cleaned_dict)
 
             except Exception:
-                # Si el intento de recuperación falla, re-lanzamos la excepción original
                 raise e

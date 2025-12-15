@@ -1,19 +1,11 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, HTTPException
 
-from app.core.security import get_current_user  # 🔒 Para proteger el endpoint
-from app.database.db import get_db
-
-# Importaciones de Core, DB y Servicios
-from app.database.schemas import (
-    ChatRequest,  # 🆕 Nuevo esquema de entrada
-    SoftwareSolution,
-    User,  # Para el usuario autenticado
+from app.core.settings import SoftwareSolution
+from app.service.ai_service import (
+    SoftwareArchitectAssistant,
 )
-from app.service.ai_service import SoftwareArchitectAssistant
-from app.service.history_service import HistoryService
 
 # Obtenemos la instancia del logger para este módulo
 logger = logging.getLogger(__name__)
@@ -22,10 +14,11 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Variable para almacenar la instancia del servicio de IA (Singleton)
+# Usamos el nuevo nombre de la clase
 _assistant_service_instance: SoftwareArchitectAssistant | None = None
 
 
-# Función de Inyección de Dependencias
+# Función de Inyección de Dependencias (El Getter del Singleton)
 def get_assistant_service() -> SoftwareArchitectAssistant:
     """
     Crea o devuelve la instancia Singleton del SoftwareArchitectAssistant.
@@ -37,8 +30,8 @@ def get_assistant_service() -> SoftwareArchitectAssistant:
     return _assistant_service_instance
 
 
-# 🆕 ENDPOINT (Ahora recibe el ID de conversación y requiere autenticación)
-@router.post("/", response_model=SoftwareSolution, status_code=status.HTTP_200_OK)
+# ENDPOINT
+@router.post("/generate", response_model=SoftwareSolution)
 def generate_ai_response(
     request: ChatRequest,  # 🆕 Usamos el nuevo esquema
     assistant_service: SoftwareArchitectAssistant = Depends(get_assistant_service),
@@ -46,18 +39,8 @@ def generate_ai_response(
     db: Session = Depends(get_db),  # 💾 Inyectamos la sesión de la BD
 ):
     pregunta_usuario = request.prompt
-    conversation_id = request.conversation_id
-
-    history_service = HistoryService(db)
 
     try:
-        # 1. 💾 PERSISTIR MENSAJE DEL USUARIO
-        # Si es el primer mensaje, actualizamos el título de la conversación
-        history_service.add_message_to_conversation(
-            conversation_id=conversation_id, tipo="usuario", texto=pregunta_usuario
-        )
-
-        # 2. 🧠 GENERAR RESPUESTA DE LA IA
         solucion_ia_obj: SoftwareSolution = assistant_service.generate_code_solution(
             pregunta_usuario
         )

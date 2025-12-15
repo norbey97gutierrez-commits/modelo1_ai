@@ -2,14 +2,13 @@ import logging
 import sys
 from contextlib import asynccontextmanager
 
+# 🔑 Importaciones de la Configuración y DB
+from app.database.db import init_db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from json_log_formatter import JSONFormatter
 
 from app.api.v1.endpoints import ai, auth, history
-
-# 🔑 Importaciones de la Configuración y DB
-from app.database.db import init_db
 
 
 # CONFIGURACIÓN DE LOGS ESTRUCTURADOS
@@ -25,6 +24,7 @@ def configure_json_logging():
     json_formatter = JSONFormatter()
     handler.setFormatter(json_formatter)
 
+    # Establecemos el nivel mínimo y añadir el handler al logger raíz
     root.setLevel(logging.INFO)
     root.addHandler(handler)
 
@@ -98,7 +98,7 @@ def create_app() -> FastAPI:
 # Instancia de la aplicación
 app = create_app()
 
-# Ejecutor de la app (Esto es manejado usualmente por un comando de consola, pero se mantiene si lo necesitas)
+# Ejecutor de la app
 if __name__ == "__main__":
     import uvicorn
 
