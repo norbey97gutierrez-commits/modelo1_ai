@@ -13,7 +13,7 @@ API de lógica de negocio construida en **Python** para gestionar la comunicaci�
 El proyecto sigue una arquitectura modular separada en capas:
 
 1.  **Capa de Endpoints (`app/api/v1/endpoints`):**
-    * `ai.py`: Define los *endpoints* HTTP (`/v1/ai/chat`) que reciben las peticiones del frontend y delegan la lógica al servicio.
+    * `ai.py`: Definimods los *endpoints* HTTP (`/v1/ai/chat`) que reciben las peticiones del frontend y delegan la lógica al servicio.
 
 2.  **Capa de Servicio (`app/service`):**
     * `ai_service.py`: Contiene la lógica de negocio pura. Aquí se orquesta la llamada al modelo de IA, la gestión del historial de la conversación y, crucialmente, la función de **estructuración** de la respuesta del LLM a un formato JSON compatible con el frontend.
@@ -31,8 +31,9 @@ El proyecto sigue una arquitectura modular separada en capas:
 
 El archivo `.env` es crucial para la seguridad y la funcionalidad. Debe contener las credenciales necesarias para inicializar el modelo de IA.
 
-```ini
-# Archivo .env
+
+Archivo .env
+
     AZURE_OPENAI_ENDPOINT="TU_ENDPOIN_AQUI"
     AZURE_OPENAI_API_KEY="TU_CLAVE_AQUI"
     AZURE_OPENAI_DEPLOYMENT_NAME="AQUI_TU_DEPLOYMENT"
