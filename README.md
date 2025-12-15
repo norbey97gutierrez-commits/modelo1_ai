@@ -1,116 +1,52 @@
-# 🐍 Asistente de IA Experto en Python
+# 🧠 Backend | AI Architect Assistant API
 
-## 📜 Descripción del Proyecto
+API de lógica de negocio construida en **Python** para gestionar la comunicación con los modelos de lenguaje (LLMs) y estructurar las respuestas antes de enviarlas al frontend.
 
-Este proyecto es una aplicación web de chat que funciona como un asistente conversacional especializado en el lenguaje de programación Python.
+## 🛠️ Tecnologías Principales
 
-El sistema está dividido en dos partes:
+* **Python 3.x**
+* **FastAPI:** Framework moderno para construir la API (implícito por la estructura modular de la app).
+* **LangChain / OpenAI SDK:** (Implícito) Framework para la orquestación de la lógica de IA, manejo de prompts y generación de respuestas estructuradas.
 
-1. Frontend (React+vitae): Interfaz de usuario moderna y responsiva.
+## 🏗️ Arquitectura y Componentes
 
-2. Backend (Python/Uvicorn/FastAPI): Servidor API que maneja la lógica de la inteligencia artificial y genera respuestas a las consultas.
+El proyecto sigue una arquitectura modular separada en capas:
 
-## 🛠️ Requisitos previos
+1.  **Capa de Endpoints (`app/api/v1/endpoints`):**
+    * `ai.py`: Define los *endpoints* HTTP (`/v1/ai/chat`) que reciben las peticiones del frontend y delegan la lógica al servicio.
 
-Antes de comenzar, asegúrese de tener instalado lo siguiente:
+2.  **Capa de Servicio (`app/service`):**
+    * `ai_service.py`: Contiene la lógica de negocio pura. Aquí se orquesta la llamada al modelo de IA, la gestión del historial de la conversación y, crucialmente, la función de **estructuración** de la respuesta del LLM a un formato JSON compatible con el frontend.
 
-- Node.js y npm/yarn: Para ejecutar la aplicación React (Frontend).
+3.  **Capa Core (`app/core`):**
+    * `config.py` / `settings.py`: Manejo de la configuración global, incluyendo la carga de variables de entorno (como la clave de la API de Gemini, por ejemplo).
 
-- Python (3.8+): Para ejecutar la API del servidor (Backend).
+4.  **Raíz:**
+    * `main.py`: Punto de entrada principal de la aplicación (Uvicorn/FastAPI).
+    * `requirements.txt`: Lista de dependencias de Python necesarias.
 
-- pip (o pipenv/poetry): Para gestionar las dependencias de Python.
+## ⚙️ Configuración del Entorno
 
+### 1. Variables de Entorno
 
-## 🚀 Instalación y configuración
+El archivo `.env` es crucial para la seguridad y la funcionalidad. Debe contener las credenciales necesarias para inicializar el modelo de IA.
 
-El proyecto se estructura en dos directorios principales ( frontend/frontend-ia y backend ). Debes instalar las dependencias por separado para cada uno.
+```ini
+# Archivo .env
+    AZURE_OPENAI_ENDPOINT="TU_ENDPOIN_AQUI"
+    AZURE_OPENAI_API_KEY="TU_CLAVE_AQUI"
+    AZURE_OPENAI_DEPLOYMENT_NAME="AQUI_TU_DEPLOYMENT"
+    AZURE_OPENAI_API_VERSION="AQUI_TU_FECHA_DE_VESION"
 
-1. Configuración del backend (API de Python)
-El backend expone el endpoint /generate que será consumido por el frontend.
+2. Instalación de Dependencias
+Ejecuta el siguiente comando para instalar todas las librerías necesarias de Python:
 
-1. Navegar al directorio del Backend:
-
-    ia-level1
-
-2. Instalar dependencias de Python:
-
-si usas pip:
-
-```sh
     pip install -r requirements.txt
-```
 
-3. Configurar Variables de Entorno (Opcional pero recomendado):
+## ▶️ Ejecución de la API
+Para iniciar el servidor de la API utilizando Uvicorn:
 
-Crea un archivo .env en el directorio raíz del backend y define variables sensibles (ej., claves API, URL de bases de datos, etc.).
+    uvicorn app.main:app --reload
 
-2. Configuración del Frontend (Aplicación React)
-El frontend contiene el código de la interfaz de usuario.
-
-1. Navegar al directorio del Frontend:
-
-```sh
-    cd frontend/
-    cd frontend-ia/
-```
-
-2. Instalar dependencias de Node:
-
-```sh
-    npm install 
-```
-
-3. Asegurar la conexión al Backend:
-
-Asegúrese de que la URL del backend en el archivo useChatLogic.js sea correcta (por defecto http://localhost:8000/generate).
-
-
-## ▶️ Ejecución de la Aplicación
-
-Para que la aplicación funcione completamente, debes ejecutar el backend y el frontend simultáneamente en dos terminales separados.
-
-### Paso 1: Iniciar el Servidor del Backend
-- Abra la primera terminal y navegue al directorio del backend ( ia-level1/ ).
-
-- Ejecuta el servidor (el comando exacto puede variar según el framework que uses, como FastAPI):
-
-    uvicorn backend.app:app --reload --port 8000
-
-(Verifique la documentación de su servidor si el comando es diferente.)
-
-### Paso 2: Iniciar el Servidor de Desarrollo del Frontend
-
-1. Abra la segunda terminal y navegue al directorio del frontend ( frontend/frontend-ia/).
-2. Ejecuta el comando de desarrollo de React (usando Vite o Create React App):
-
-```sh
-    npm run dev
-```
-3. Acceder a la Aplicación:
-La aplicación React estará disponible en tu navegador, generalmente en: http://localhost:5173/(o el puerto que indica tu terminal).
-
-## 📁 Estructura del Proyecto
-
-La aplicación sigue una arquitectura limpia para la fácil escalabilidad:
-
-| Directorio/Archivo               | Descripción                                                             |
-|----------------------------------|-------------------------------------------------------------------------|
-| 📂 `backend/`                 | Servidor API, lógica de IA y modelos                                    |
-| 📂 `frontend/`                   | Aplicación React    
-| 📂  frontend-ia/                 | Paquete de las carpetas del sistema
-| 📄 `frontend-id/src/App.jsx`     | Componente principal - contenedor de diseño                             |
-| 📂 `frontend-id/src/hooks/`      | Custom Hooks (`useChatLogic.js`)                                        |
-| 📂 `frontend-id/src/components/` | Componentes UI (`Mensaje.jsx`, `ChatInput.jsx`, etc.)                   |
-| 🎨 `frontend-id/src/App.css`     | Estilos globales y variables CSS                                        |
-
-
-## 🎨 Características adicionales
-
-- Diseño Oscuro (Dark Mode): Interfaz optimizada para ambientes de poca luz.
-
-- Diseño Modular: Componentes separados para alta mantenibilidad.
-
-- Scroll Automático: La conversación se desplaza automáticamente al recibir una nueva respuesta.
-
-- Manejo de Carga: Indicadores de "Cargando..." y manejo de errores de conexión.
+La API estará disponible en http://localhost:8000(o el puerto que se define en la configuración).
 
