@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from json_log_formatter import JSONFormatter
 
-from app.api.v1.endpoints import ai
+from app.api.v1.endpoints import ai, auth, history
 from app.core.config import ALLOWED_ORIGINS
 
 
@@ -54,6 +54,20 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # Endpoint de Generación (EXISTENTE)
+    app.include_router(ai.router, prefix="/v1/generate", tags=["AI Generation"])
+
+    # 🆕 Endpoints de Autenticación
+    app.include_router(auth.router, prefix="/v1/auth", tags=["Authentication"])
+
+    # 🆕 Endpoints de Historial
+    app.include_router(history.router, prefix="/v1/history", tags=["History"])
+
+    # Endpoint raíz (si lo tienes)
+    @app.get("/")
+    def read_root():
+        return {"message": "API del Arquitecto IA funcionando"}
 
     # Inclusión de Rutas (Endpoints)
     app.include_router(ai.router, prefix="/v1", tags=["Generación AI"])

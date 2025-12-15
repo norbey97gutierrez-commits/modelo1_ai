@@ -1,5 +1,4 @@
 import json
-from functools import lru_cache
 
 from langchain_core.exceptions import OutputParserException
 from langchain_core.output_parsers import JsonOutputParser
@@ -13,8 +12,11 @@ from tenacity import (
     wait_exponential,
 )
 
-from app.core.config import config
-from app.core.settings import SoftwareSolution
+# ⚠️ Importaciones ajustadas a tu estructura de Core y Database
+from app.core.settings import settings  # Usamos 'settings' si necesitas configuraciones
+
+# Asumimos que SoftwareSolution está en schemas.py para tipado
+from app.database.models import SoftwareSolution
 
 
 class SoftwareArchitectAssistant:
@@ -23,16 +25,22 @@ class SoftwareArchitectAssistant:
     """
 
     def __init__(self):
+        # Inicialización del LLM
         self.llm = AzureChatOpenAI(
-            azure_endpoint=config.AZURE_OPENAI_ENDPOINT,
-            azure_deployment=config.AZURE_OPENAI_DEPLOYMENT_NAME,
-            api_key=config.AZURE_OPENAI_API_KEY,
-            openai_api_version=config.AZURE_OPENAI_API_VERSION,
+            azure_endpoint=settings.AZURE_OPENAI_ENDPOINT,
+            azure_deployment=settings.AZURE_OPENAI_DEPLOYMENT_NAME,
+            api_key=settings.AZURE_OPENAI_API_KEY,
+            openai_api_version="2024-02-15",  # Ajusta la versión API si es necesario
             temperature=0.2,
         )
 
         self.parser = JsonOutputParser(pydantic_object=SoftwareSolution)
 
+        # ----------------------------------------------------
+        # ⚠️ Nota: Si deseas incluir el historial en el prompt
+        # para contexto, la plantilla debe actualizarse para
+        # incluir una variable 'history' o 'contexto'.
+        # ----------------------------------------------------
         self.template = PromptTemplate(
             input_variables=["pregunta"],
             template=(
@@ -58,8 +66,11 @@ class SoftwareArchitectAssistant:
         ),
         reraise=True,
     )
-    @lru_cache(maxsize=32)
+    # ⚠️ ELIMINACIÓN DE @lru_cache: Aseguramos que cada solicitud se procese.
     def generate_code_solution(self, consulta: str) -> SoftwareSolution:
+        """
+        Genera una solución de software estructurada para la consulta dada.
+        """
         print(f"INFO: Generando solución de software para: {consulta}")
         try:
             # Invocación de la cadena
@@ -76,6 +87,8 @@ class SoftwareArchitectAssistant:
                     if hasattr(e.response, "content")
                     else str(e.response)
                 )
+
+                # Lógica para limpiar el JSON (quitar ```json y ```)
                 if "```json" in raw_content:
                     raw_json_string = (
                         raw_content.split("```json")[1].split("```")[0].strip()
@@ -83,8 +96,11 @@ class SoftwareArchitectAssistant:
                 else:
                     raw_json_string = raw_content.strip()
 
+                # Cargar el JSON limpio y validarlo contra el esquema
                 cleaned_dict = json.loads(raw_json_string)
 
                 return SoftwareSolution.model_validate(cleaned_dict)
+
             except Exception:
+                # Si el intento de recuperación falla, re-lanzamos la excepción original
                 raise e
