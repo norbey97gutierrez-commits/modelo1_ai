@@ -2,12 +2,11 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 
-# 🔑 Importaciones mínimas requeridas
 from app.core.settings import (
-    ChatRequest,  # El esquema de entrada (con solo 'prompt' si simplificamos)
-    SoftwareSolution,  # Para el response_model
+    ChatRequest,
+    SoftwareSolution,
 )
-from app.service.ai_service import SoftwareArchitectAssistant  # El servicio de la IA
+from app.service.ai_service import SoftwareArchitectAssistant
 
 # Obtenemos la instancia del logger para este módulo
 logger = logging.getLogger(__name__)
@@ -15,11 +14,11 @@ logger = logging.getLogger(__name__)
 # Creamos un enrutador para agrupar rutas
 router = APIRouter()
 
-# ⚠️ Nota: El Singleton sigue siendo útil para la IA, lo mantenemos
+# Instancia inglenton
 _assistant_service_instance: SoftwareArchitectAssistant | None = None
 
 
-# Función de Inyección de Dependencias (El Getter del Singleton)
+# Función de Inyección de Dependencias
 def get_assistant_service() -> SoftwareArchitectAssistant:
     """
     Crea o devuelve la instancia Singleton del SoftwareArchitectAssistant.
@@ -31,18 +30,18 @@ def get_assistant_service() -> SoftwareArchitectAssistant:
     return _assistant_service_instance
 
 
-# ENDPOINT SIMPLE DE GENERACIÓN DE IA
+# ENDPOINT DE GENERACIÓN DE IA
 @router.post("/generate", response_model=SoftwareSolution)
 def generate_ai_response(
-    # 1. Entrada: Solo el esquema de la solicitud (prompt)
+    # Entrada del (prompt)
     request: ChatRequest,
-    # 2. Dependencia: Solo el servicio de la IA (Singleton)
+    # Dependencia Singleton
     assistant_service: SoftwareArchitectAssistant = Depends(get_assistant_service),
 ):
     pregunta_usuario = request.prompt
 
     try:
-        # 🔑 Lógica de la IA: Solo llamamos al servicio
+        # Lógica de la IA llamamos al servicio
         solucion_ia_obj: SoftwareSolution = assistant_service.generate_code_solution(
             pregunta_usuario
         )

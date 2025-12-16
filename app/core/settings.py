@@ -2,26 +2,15 @@ from typing import List, Optional  # 🔑 Añadimos Optional para 'framework'
 
 from pydantic import BaseModel, Field
 
-# ===============================================
-# 1. ESQUEMA DE ENTRADA (Input Model)
-# ===============================================
 
-
+# Esquema del input
 class ChatRequest(BaseModel):
     """Estructura para la solicitud de chat del usuario."""
 
     prompt: str = Field(description="La pregunta o requerimiento técnico del usuario.")
 
 
-# ===============================================
-# 2. MODELO DE SALIDA ESTRUCTURADA (Output Model)
-# ===============================================
-
-
-# ⚠️ La clase CodeSnippet ya no es necesaria si solo reportamos
-# el código principal en el campo 'codigo' y los nombres en 'archivos'.
-# Si la IA necesita generar múltiples archivos complejos, la mantenemos,
-# pero simplificaremos 'SoftwareSolution' para el frontend.
+# MODELO DE SALIDA ESTRUCTURADA
 class CodeSnippet(BaseModel):
     """Estructura para representar un único fragmento de código."""
 
@@ -39,7 +28,6 @@ class CodeSnippet(BaseModel):
 class SoftwareSolution(BaseModel):
     """Estructura completa para la solución de software generada por la IA, ajustada para el frontend."""
 
-    # 🔑 CAMPOS NUEVOS/RENOMBRADOS REQUERIDOS POR EL FRONTEND:
     nombre: str = Field(
         description="Nombre descriptivo o título breve para el proyecto/solución (ej: 'Calculadora CLI')."
     )
@@ -51,23 +39,18 @@ class SoftwareSolution(BaseModel):
         description="Framework o librería principal utilizada (ej: 'FastAPI', 'React', si aplica).",
     )
 
-    # 🔑 RENOMBRADO: 'explicacion_tecnica' -> 'explicacion'
     explicacion: str = Field(
         description="Explicación detallada de la solución, la lógica de diseño y los principios utilizados."
     )
 
-    # 🔑 NUEVO CAMPO PARA EL CÓDIGO PRINCIPAL:
     codigo: str = Field(
         description="El código fuente del archivo principal, para mostrar en el SyntaxHighlighter."
     )
 
-    # 🔑 AJUSTADO: 'archivos_codigo' -> 'archivos' (para coincidir con solucion.archivos?.length)
-    # Ya que el código principal va en 'codigo', esta lista contendrá los nombres de los archivos secundarios.
     archivos: List[str] = Field(
         description="Lista de los NOMBRES de los archivos que componen la solución (ej: ['main.py', 'settings.py', 'router.py'])."
     )
 
-    # CAMPOS ORIGINALES:
     dependencias: List[str] = Field(
         description="Lista de dependencias, librerías o paquetes externos que deben instalarse."
     )

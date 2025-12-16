@@ -6,11 +6,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from json_log_formatter import JSONFormatter
 
-# 🔑 Importaciones mínimas: Solo necesitamos el router 'ai'
 from app.api.v1.endpoints import ai
 
 
-# CONFIGURACIÓN DE LOGS ESTRUCTURADOS (Se mantiene)
+# CONFIGURACIÓN DE LOGS ESTRUCTURADOS
 def configure_json_logging():
     """Configura el manejador de logs para usar formato JSON."""
     root = logging.getLogger()
@@ -28,20 +27,18 @@ def configure_json_logging():
     root.addHandler(handler)
 
 
-# Llamamos a la función de configuración justo al inicio de la ejecución del script
+# Llamamos a la función de configuración.
 configure_json_logging()
 
 
-# 1. 💾 Definir el Lifespan (SIMPLIFICADO: Eliminamos la inicialización de la DB)
+# Inicio y apagado de la app controlado.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
     Función que maneja los eventos de inicio y apagado de la aplicación.
     """
-    # ⚠️ Eliminamos la llamada a init_db() para evitar errores de conexión a PostgreSQL
     print("Iniciando la aplicación...")
     yield
-    # Lógica de Cierre
     print("Apagando la aplicación...")
 
 
@@ -51,7 +48,7 @@ def create_app() -> FastAPI:
         title="Software Development AI Assistant",
         description="Backend centrado en la generación de IA estructurada.",
         version="1.0.0",
-        lifespan=lifespan,  # Asignamos el lifespan simplificado
+        lifespan=lifespan,
     )
 
     # Configuración de Middleware (CORS)
@@ -65,7 +62,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Endpoint de Generación (AI)
+    # Endpoint de Generación
     app.include_router(ai.router, prefix="/v1", tags=["AI Generation"])
 
     # Rutas de salud
