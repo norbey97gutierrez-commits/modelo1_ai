@@ -2,10 +2,12 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.core.settings import SoftwareSolution
-from app.service.ai_service import (
-    SoftwareArchitectAssistant,
+# 🔑 Importaciones mínimas requeridas
+from app.core.settings import (
+    ChatRequest,  # El esquema de entrada (con solo 'prompt' si simplificamos)
+    SoftwareSolution,  # Para el response_model
 )
+from app.service.ai_service import SoftwareArchitectAssistant  # El servicio de la IA
 
 # Obtenemos la instancia del logger para este módulo
 logger = logging.getLogger(__name__)
@@ -13,8 +15,7 @@ logger = logging.getLogger(__name__)
 # Creamos un enrutador para agrupar rutas
 router = APIRouter()
 
-# Variable para almacenar la instancia del servicio de IA (Singleton)
-# Usamos el nuevo nombre de la clase
+# ⚠️ Nota: El Singleton sigue siendo útil para la IA, lo mantenemos
 _assistant_service_instance: SoftwareArchitectAssistant | None = None
 
 
@@ -30,55 +31,43 @@ def get_assistant_service() -> SoftwareArchitectAssistant:
     return _assistant_service_instance
 
 
-# ENDPOINT
+# ENDPOINT SIMPLE DE GENERACIÓN DE IA
 @router.post("/generate", response_model=SoftwareSolution)
 def generate_ai_response(
-    request: ChatRequest,  # 🆕 Usamos el nuevo esquema
+    # 1. Entrada: Solo el esquema de la solicitud (prompt)
+    request: ChatRequest,
+    # 2. Dependencia: Solo el servicio de la IA (Singleton)
     assistant_service: SoftwareArchitectAssistant = Depends(get_assistant_service),
-    current_user: User = Depends(get_current_user),  # 🔒 Protección
-    db: Session = Depends(get_db),  # 💾 Inyectamos la sesión de la BD
 ):
     pregunta_usuario = request.prompt
 
     try:
+        # 🔑 Lógica de la IA: Solo llamamos al servicio
         solucion_ia_obj: SoftwareSolution = assistant_service.generate_code_solution(
             pregunta_usuario
         )
 
-        # 3. 💾 PERSISTIR RESPUESTA DE LA IA (Guardamos la solución estructurada)
-        history_service.add_message_to_conversation(
-            conversation_id=conversation_id,
-            tipo="ia",
-            texto=solucion_ia_obj.explicacion_tecnica,  # Guardamos la explicación como texto principal
-            data_ia=solucion_ia_obj,  # Guardamos el objeto SoftwareSolution completo en el campo JSON
-        )
-
         logger.info(
-            "Solicitud AI procesada y persistida exitosamente.",
+            "Solicitud AI procesada exitosamente.",
             extra={
-                "user_id": current_user.id,
-                "conv_id": conversation_id,
+                "pregunta": pregunta_usuario,
                 "status": 200,
             },
         )
 
-        # Retornamos el modelo de respuesta esperado por el frontend
+        # Retornamos el modelo de respuesta esperado
         return solucion_ia_obj
 
     except Exception as e:
         logger.error(
-            "Falla crítica en el servicio de IA o al persistir.",
+            "Falla crítica en el servicio de IA.",
             exc_info=True,
             extra={
                 "error_tipo": type(e).__name__,
                 "pregunta_fallida": pregunta_usuario,
             },
         )
-        # ⚠️ Si falla la IA, debemos intentar eliminar el mensaje del usuario
-        # que fue guardado en el paso 1 para evitar estados incompletos.
-        # Por simplicidad, por ahora solo elevamos la excepción.
-
         raise HTTPException(
             status_code=500,
-            detail="Error interno del servidor al procesar la IA o guardar la conversación. Revise logs.",
+            detail="Error interno del servidor al procesar la IA. Revise logs.",
         )

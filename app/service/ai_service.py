@@ -1,7 +1,13 @@
 import json
+import os  # Necesario para asegurar la ruta de la caché
+
+from langchain_community.cache import SQLiteCache
 
 # Importaciones de LangChain y OpenAI
 from langchain_core.exceptions import OutputParserException
+
+# 🔑 Importaciones de LangChain para la caché
+from langchain_core.globals import set_llm_cache
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
@@ -17,13 +23,32 @@ from app.core.config import config
 from app.core.settings import SoftwareSolution
 
 
+# 🔑 CONFIGURACIÓN DE LA CACHÉ
+# Debe ser ejecutada una sola vez al inicio del programa
+def setup_llm_caching():
+    """Configura el sistema de caché global de LangChain usando SQLite."""
+    try:
+        # Usamos una ruta relativa para el archivo de caché
+        cache_path = os.path.join(os.getcwd(), ".llm_cache.db")
+
+        # ⚠️ IMPORTANTE: Esta es la configuración global de la caché para todos los LLM de LangChain.
+        set_llm_cache(SQLiteCache(database_path=cache_path))
+        print(f"INFO: LangChain Cache configurada y apuntando a: {cache_path}")
+    except Exception as e:
+        print(f"ADVERTENCIA: No se pudo configurar la caché de LangChain: {e}")
+
+
+# Llamamos a la configuración de la caché inmediatamente
+setup_llm_caching()
+
+
 class SoftwareArchitectAssistant:
     """
     Motor de generación de software universal con salida estructurada.
     """
 
     def __init__(self):
-        # Inicialización del LLM
+        # Inicialización del LLM. Ahora usará la caché global configurada.
         self.llm = AzureChatOpenAI(
             azure_endpoint=config.AZURE_OPENAI_ENDPOINT,
             azure_deployment=config.AZURE_OPENAI_DEPLOYMENT_NAME,
@@ -34,10 +59,6 @@ class SoftwareArchitectAssistant:
 
         self.parser = JsonOutputParser(pydantic_object=SoftwareSolution)
 
-        # ----------------------------------------------------
-        # ⚠️ Nota: Si deseas incluir el historial en el prompt
-        # para contexto, la plantilla debe actualizarse para
-        # incluir una variable 'history' o 'contexto'.
         # ----------------------------------------------------
         self.template = PromptTemplate(
             input_variables=["pregunta"],
@@ -54,6 +75,7 @@ class SoftwareArchitectAssistant:
             },
         )
 
+        # 🔑 La caché se aplica automáticamente a la cadena que usa el LLM
         self.cadena = self.template | self.llm | self.parser
 
     @retry(
@@ -64,29 +86,29 @@ class SoftwareArchitectAssistant:
         ),
         reraise=True,
     )
-    # ⚠️ ELIMINACIÓN DE @lru_cache: Aseguramos que cada solicitud se procese.
     def generate_code_solution(self, consulta: str) -> SoftwareSolution:
         """
         Genera una solución de software estructurada para la consulta dada.
         """
         print(f"INFO: Generando solución de software para: {consulta}")
         try:
-            # Invocación de la cadena
+            # 🔑 INVOCACIÓN: LangChain verifica automáticamente la caché aquí.
+            # Si el prompt 'consulta' existe en la caché, devuelve la respuesta guardada
+            # sin llamar a Azure OpenAI.
             return self.cadena.invoke({"pregunta": consulta})
 
         except OutputParserException as e:
+            # ... (Manejo de errores de parseo manual, el código se mantiene igual) ...
             print(
                 "ADVERTENCIA: Falló el parseo automático. Intentando recuperación manual..."
             )
             try:
-                # Intento de extracción de JSON crudo
                 raw_content = (
                     e.response.content
                     if hasattr(e.response, "content")
                     else str(e.response)
                 )
 
-                # Lógica para limpiar el JSON (quitar ```json y ```)
                 if "```json" in raw_content:
                     raw_json_string = (
                         raw_content.split("```json")[1].split("```")[0].strip()
@@ -94,10 +116,7 @@ class SoftwareArchitectAssistant:
                 else:
                     raw_json_string = raw_content.strip()
 
-                # Cargar el JSON limpio y validarlo contra el esquema
                 cleaned_dict = json.loads(raw_json_string)
-
-                # ✅ CORRECCIÓN AQUÍ: Usamos model_validate para compatibilidad con Pydantic v2
                 return SoftwareSolution.model_validate(cleaned_dict)
 
             except Exception:

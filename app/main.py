@@ -2,16 +2,15 @@ import logging
 import sys
 from contextlib import asynccontextmanager
 
-# 🔑 Importaciones de la Configuración y DB
-from app.database.db import init_db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from json_log_formatter import JSONFormatter
 
-from app.api.v1.endpoints import ai, auth, history
+# 🔑 Importaciones mínimas: Solo necesitamos el router 'ai'
+from app.api.v1.endpoints import ai
 
 
-# CONFIGURACIÓN DE LOGS ESTRUCTURADOS
+# CONFIGURACIÓN DE LOGS ESTRUCTURADOS (Se mantiene)
 def configure_json_logging():
     """Configura el manejador de logs para usar formato JSON."""
     root = logging.getLogger()
@@ -33,18 +32,16 @@ def configure_json_logging():
 configure_json_logging()
 
 
-# 1. 💾 Definir el Lifespan (Inicialización de la DB)
+# 1. 💾 Definir el Lifespan (SIMPLIFICADO: Eliminamos la inicialización de la DB)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
     Función que maneja los eventos de inicio y apagado de la aplicación.
     """
-    # Lógica de Inicio: Inicializa la Base de Datos (Crea tablas)
-    print("Inicializando la Base de Datos (Creando Tablas si no existen)...")
-    init_db()  # 👈 Llamada a la función de la capa database
-    print("Base de Datos Inicializada.")
+    # ⚠️ Eliminamos la llamada a init_db() para evitar errores de conexión a PostgreSQL
+    print("Iniciando la aplicación...")
     yield
-    # Lógica de Cierre (por si necesitas limpiar recursos al apagar)
+    # Lógica de Cierre
     print("Apagando la aplicación...")
 
 
@@ -52,15 +49,13 @@ def create_app() -> FastAPI:
     """Crea y configura la instancia de la aplicación FastAPI."""
     app = FastAPI(
         title="Software Development AI Assistant",
-        description="Backend escalable y mantenible para un modelo de IA experto en desarrollo.",
+        description="Backend centrado en la generación de IA estructurada.",
         version="1.0.0",
-        lifespan=lifespan,  # 👈 Asignamos el lifespan aquí
+        lifespan=lifespan,  # Asignamos el lifespan simplificado
     )
 
     # Configuración de Middleware (CORS)
-    # ⚠️ Usamos settings.ALLOWED_ORIGINS si la tienes definida en settings.py
-    # Si no la tienes definida, usa una lista vacía o tu dominio frontend.
-    ALLOWED_ORIGINS = ["*"]  # Temporalmente amplio, si usabas config.ALLOWED_ORIGINS
+    ALLOWED_ORIGINS = ["*"]
 
     app.add_middleware(
         CORSMiddleware,
@@ -70,24 +65,15 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # 2. Inclusión de Routers
-
-    # Endpoints de Autenticación
-    app.include_router(auth.router, prefix="/v1/auth", tags=["Authentication"])
-
-    # Endpoints de Historial
-    app.include_router(history.router, prefix="/v1/history", tags=["History"])
-
-    # Endpoint de Generación
-    # ⚠️ Hemos ajustado el prefix para que los endpoints sean /v1/generate
-    app.include_router(ai.router, prefix="/v1/generate", tags=["AI Generation"])
+    # Endpoint de Generación (AI)
+    app.include_router(ai.router, prefix="/v1", tags=["AI Generation"])
 
     # Rutas de salud
     @app.get("/health")
     def health_check():
         return {"status": "ok", "message": "API running smoothly"}
 
-    # Endpoint raíz (si lo tienes)
+    # Endpoint raíz
     @app.get("/")
     def read_root():
         return {"message": "API del Arquitecto IA funcionando"}
